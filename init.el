@@ -5,11 +5,10 @@
 (column-number-mode)
 (global-display-line-numbers-mode 1)
 (hl-line-mode 1)
+(setq warning-minimum-level :error)
 
 (setq make-backup-files nil)
 
-(setq default-directory "~/org/"
-      initial-buffer-choice "~/org/Inbox.org")
 (add-hook 'emacs-startup-hook (lambda ()
                               (when (get-buffer "*scratch*")
                                 (kill-buffer "*scratch*"))))
@@ -18,8 +17,6 @@
 (set-face-attribute 'default nil :font "Source Code Pro Semibold" :height 108)
 ;; Set the fixed pitch face
 (set-face-attribute 'fixed-pitch nil :font "Source Code Pro Semibold" :height 108)
-;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Calibri" :height 108 :weight 'regular)
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -48,6 +45,8 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package wgrep)
+
+(use-package avy)
 
 (use-package which-key
   :init (which-key-mode)
@@ -149,6 +148,51 @@
   :after evil
   :config
   (evil-collection-init))
+
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1))
+(use-package evil-lion
+  :config
+  (evil-lion-mode))
+(use-package evil-commentary
+  :config
+  (evil-commentary-mode))
+(use-package evil-snipe
+  :config
+  (evil-snipe-mode +1)
+  (evil-snipe-override-mode +1))
+(use-package evil-snipe
+  :config
+  (evil-snipe-mode +1)
+  (evil-snipe-override-mode +1))
+(use-package vimish-fold
+  :after evil)
+(use-package evil-vimish-fold
+  :after vimish-fold
+  :hook ((prog-mode conf-mode text-mode) . evil-vimish-fold-mode))
+(use-package evil-exchange
+  :init
+  (evil-exchange-install))
+(use-package evil-goggles
+  :ensure t
+  :config
+  (evil-goggles-mode)
+
+  ;; optionally use diff-mode's faces; as a result, deleted text
+  ;; will be highlighed with `diff-removed` face which is typically
+  ;; some red color (as defined by the color theme)
+  ;; other faces such as `diff-added` will be used for other actions
+  (evil-goggles-use-diff-faces))
+(use-package evil-owl
+:config
+(setq evil-owl-max-string-length 500)
+(add-to-list 'display-buffer-alist
+             '("*evil-owl*"
+               (display-buffer-in-side-window)
+               (side . bottom)
+               (window-height . 0.3)))
+(evil-owl-mode))
 
 (use-package hydra)
 
@@ -670,6 +714,39 @@ With \\[universal-argument] do it for the current file instead."
          ("C-c C-b" . prot/diff-refine-hunk-or-buf) ; replace `diff-refine-hunk'
          ("C-c C-n" . prot/diff-restrict-view-dwim)))
 
+(use-package jenkinsfile-mode)
+(add-to-list 'auto-mode-alist '("\\.jenkinsfile\\'" . jenkinsfile-mode))
+
+(use-package json-mode)
+
+(use-package yaml-mode)
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+
+(use-package company)
+(add-hook `after-init-hook `global-company-mode)
+
+(use-package tree-sitter)
+(use-package tree-sitter-langs)
+
+(use-package flycheck
+:ensure t
+:init (global-flycheck-mode))
+
+(use-package lsp-mode
+:init
+;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+(setq lsp-keymap-prefix "C-c l")
+:hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+       (groovy-mode . lsp)
+       (json-mode . lsp)
+       (yaml-mode . lsp)
+       (groovy-mode . lsp)
+       ;; if you want which-key integration
+       (lsp-mode . lsp-enable-which-key-integration))
+:commands lsp)
+(use-package lsp-ui :commands lsp-ui-mode)
+(use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
 (use-package general
   :init
   (setq general-override-states '(insert
@@ -689,8 +766,13 @@ With \\[universal-argument] do it for the current file instead."
   (rune/leader-keys
     "." '(find-file :which-key "Find File")
     "/" '(consult-ripgrep :which-key "Search File")
+    "<tab>" '(:ignore t :wk "Workspaces")
+    "<tab>n" '(tab-new :wk "New Workspace")
+    "<tab>s" '(tab-switcher :wk "Switch Workspaces")
+    "<tab>n" '(prot/tab-bar-select-tab-dwim :wk "Workspace Magic")
     "b" '(:ignore t :which-key "Buffers")
-    "bb" '(consult-buffer :which-key "Switch Buffer")
+    "bb" '(switch-to-buffer :which-key "Switch Buffer")
+    "bd" '(image-kill-buffer :wk "Kill Current Buffer")
     "bp" '(previous-buffer :wk "Previous Buffer")
     "bn" '(next-buffer :wk "Next Buffer")
     "n" '(:ignore t :wk "Notes")
@@ -712,6 +794,7 @@ With \\[universal-argument] do it for the current file instead."
     "ts" '(hydra-text-scale/body :which-key "scale text")
     "tt" '(load-theme :which-key "choose theme")
     "w" '(:ignore t :which-key "Window commands")
+    "wm" '(prot/window-single-toggle :wk "Toggle Maximized Window")
     "wv" '(split-window-right :wk "Split Window (v)")
     "ws" '(split-window-below :wk "Split Window (h)")
     "wd" '(delete-window :wk "Delete Window")

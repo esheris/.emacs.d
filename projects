@@ -1,4 +1,7 @@
 ;;; -*- lisp-data -*-
-(("c:/Users/esher/.emacs.d/")
- ("c:/Users/esher/org/")
- ("~/org/"))
+(("~/org/")
+ ("~/.config/emacs/")
+ ("~/code/multiplayer-service/")
+ ("~/code/production-a2-apse/")
+ ("c:/Users/esher/.emacs.d/")
+ ("c:/Users/esher/org/"))
