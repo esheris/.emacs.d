@@ -989,6 +989,8 @@ With \\[universal-argument] do it for the current file instead."
       "bd" '(image-kill-buffer :wk "Kill Current Buffer")
       "bp" '(previous-buffer :wk "Previous Buffer")
       "bn" '(next-buffer :wk "Next Buffer")
+      "g" '(:ignore t :wk "Git")
+      "gg" '(magit :wk "magit status")
       "j"   '(:ignore t :which-key "jump")
       "jf"  '(avy-goto-char :which-key "jump to char")
       "js" '(avy-goto-char-2 :wk "jump to char 2")
